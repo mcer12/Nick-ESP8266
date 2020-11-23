@@ -15,5 +15,7 @@ https://www.thingiverse.com/thing:4014357
   
 **UPDATE 11/12/2020: Firmware rewrite for duplexed IN-12 version is done, others will follow. With this firmware, the duplexed version runs smoothly at ~70hz. Little to no stutter can be observed only at the lowest brightness (low duty cycle). The firmware contains simple config portal, check out screenshot below.**
 
+**UPDATE 11/23/2020: New firmware was added for all clock variants. **
+
 
 ![alt text](https://github.com/mcer12/Nick-ESP8266/raw/master/Media/config_portal.png)
