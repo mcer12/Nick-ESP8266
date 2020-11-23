@@ -11,7 +11,8 @@ time_t getNtpTime()
   //Serial.println("Transmit NTP Request");
   // get a random server from the pool
   WiFi.hostByName(ntpServerName, ntpServerIP);
-  //Serial.print(ntpServerName);
+  Serial.print("NTP: Connecting to ");
+  Serial.println(ntpServerName);
   //Serial.print(": ");
   //Serial.println(ntpServerIP);
   sendNTPpacket(ntpServerIP);
@@ -19,7 +20,7 @@ time_t getNtpTime()
   while (millis() - beginWait < 1500) {
     int size = Udp.parsePacket();
     if (size >= NTP_PACKET_SIZE) {
-      Serial.println("Receive NTP Response");
+      Serial.println("NTP: Response received");
       Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read packet into the buffer
       unsigned long secsSince1900;
       // convert four bytes starting at location 40 to a long integer
@@ -27,7 +28,8 @@ time_t getNtpTime()
       secsSince1900 |= (unsigned long)packetBuffer[41] << 16;
       secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
       secsSince1900 |= (unsigned long)packetBuffer[43];
-      return secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR;
+
+      return secsSince1900 - 2208988800UL;
       //return czLocal.toLocal(secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR);
     }
   }
@@ -40,20 +42,29 @@ time_t getNtpTime()
 time_t getNtpLocalTime() {
   int retries = 3;
   int iterator = 0;
-  time_t receivedTime = getNtpTime();
+  time_t receivedTime = 0;
 
   while (iterator < retries && receivedTime == 0) {
-    iterator++;
     receivedTime = getNtpTime();
+    iterator++;
   }
   if (receivedTime == 0) {
-    timeUpdateResult = UPDATE_FAIL;
+    timeUpdateStatus = UPDATE_FAIL;
     failedAttempts += 1;
+    Serial.print("NTP: Sync fail! Attempt: ");
+    Serial.println(failedAttempts);
     return 0;
   }
-  timeUpdateResult = UPDATE_SUCCESS;
+  Serial.print("NTP: Sync success! Received NTP time: ");
+  Serial.println(receivedTime);
+  timeUpdateFirst = false;
+  timeUpdateStatus = UPDATE_SUCCESS;
   failedAttempts = 0;
-  return czLocal.toLocal(receivedTime);
+
+  if (json["dst_enable"].as<int>() == 1) {
+    return receivedTime + (json["std_offset"].as<int>() * 60);
+  }
+  return TZ.toLocal(receivedTime);
 
 }
 

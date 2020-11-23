@@ -1,4 +1,28 @@
 
+void setTemporaryColonColor(int seconds, RgbColor color) {
+  colonColor = color;
+  onceTicker.once(seconds, resetColonColor);
+}
+
+void resetColonColor() {
+  colonColor = colonColorDefault[bri];
+}
+/*
+void initColon() {
+  colonTicker.attach_ms(1000, handleColon);
+}
+*/
+void handleColon() {
+  toggleSeconds = !toggleSeconds;
+  if (toggleSeconds) {
+    SetupAnimations(colonColor, RgbColor(0, 0, 0));
+  }
+  else {
+    strip.ClearTo(RgbColor(0, 0, 0));
+    SetupAnimations(RgbColor(0, 0, 0), colonColor);
+  }
+}
+
 struct stripeAnimationState
 {
   RgbColor StartingColor;  // the color the animation starts at
