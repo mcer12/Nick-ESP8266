@@ -5,6 +5,9 @@ Nick is an open source nixie clock based on ESP8266 designed to be as simple as 
   
 ![alt text](https://github.com/mcer12/Nick-ESP8266/raw/master/Media/IN12.jpg)
 
+Check out wiki:
+https://github.com/mcer12/Nick-ESP8266/wiki
+
 3d printed case here:  
 https://www.thingiverse.com/thing:4014357
   
