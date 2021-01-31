@@ -115,6 +115,9 @@ void handleRoot() {
     if (server.hasArg("rst_ip")) {
       json["rst_ip"] = server.arg("rst_ip");
     }
+    if (server.hasArg("ntp")) {
+      json["ntp"] = server.arg("ntp");
+    }
     if (server.hasArg("std_offset")) {
       json["std_offset"] = server.arg("std_offset");
     }
@@ -275,6 +278,13 @@ void handleRoot() {
 
   html += "<h2>Time settings</h2>";
   html += "<p>Set your timezone and optionally also daylight saving.</p>";
+
+  html += "<div class=\"row\"><label for=\"ntp\">NTP provider (leave empty to use ";
+  html += ntpServerName;
+  html += "):</label>";
+  html += "<input type=\"text\" id=\"ntp\" name=\"ntp\" value=\"";
+  html += json["ntp"].as<const char*>();
+  html += "\"></div>";
 
   html += "<div class=\"row\"><label for=\"std_offset\">UTC offset (in minutes, -660 = -11h, 660 = +11h):</label>";
   html += "<input type=\"number\" id=\"std_offset\" name=\"std_offset\" min=\"-660\" max=\"660\" value=\"";
