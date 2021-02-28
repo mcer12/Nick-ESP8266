@@ -175,6 +175,16 @@ WiFiUDP Udp;
 ESP8266HTTPUpdateServer httpUpdateServer;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 
+int sleep_hour;
+int wake_hour;
+int dim_hour;
+int cathode_start;
+int cathode_end;
+
+bool inSleepRange;
+bool inDimRange;
+bool inHealRange;
+
 // the setup function runs once when you press reset or power the board
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
@@ -284,6 +294,22 @@ void setup() {
     delay(500);
   }
 
+  wake_hour = json["wake_hour"].as<int>();
+  if (wake_hour == -1){
+    dim_hour = -1;
+    sleep_hour = -1;
+  } else {
+    dim_hour = json["dim_hour"].as<int>();
+    sleep_hour = json["sleep_hour"].as<int>();
+  }
+
+  cathode_start = json["cathode_start"].as<int>();
+  cathode_end = json["cathode_end"].as<int>();
+
+  if (cathode_start == -1 || cathode_end == -1) {
+    cathode_start = -1;
+    cathode_end = -1;
+  }
 }
 
 // the loop function runs over and over again forever
@@ -298,11 +324,21 @@ void loop() {
 
   if (millis() - prevDisplayMillis >= 1000) { //update the display only if time has changed
     prevDisplayMillis = millis();
+    // https://stackoverflow.com/a/17213258
+    inSleepRange = wake_hour > sleep_hour && hour() >= sleep_hour && hour() <= wake_hour || wake_hour < sleep_hour && (hour() >= sleep_hour || hour() <= wake_hour);
+    inDimRange = wake_hour > dim_hour && hour() >= dim_hour && hour() <= wake_hour || wake_hour < dim_hour && (hour() >= dim_hour || hour() <= wake_hour);
+    inHealRange = cathode_end > cathode_start && hour() >= cathode_start && hour() <= cathode_end || cathode_end < cathode_start && (hour() >= cathode_start || hour() <= cathode_end);
+    if (cathode_start == -1)
+      inHealRange = false;
     toggleNightMode();
-
+ 
+    if (inSleepRange && sleep_hour != -1){
+      // is supposed to be blank, don't want it to write to the tubes when its supposed to be sleeping.
+    } else
     if (
-      (json["cathode"].as<int>() == 1 && (hour() >= 2 && hour() <= 6) && minute() < 10) ||
-      (json["cathode"].as<int>() == 2 && (((hour() >= 2 && hour() <= 6) && minute() < 10) || minute() < 1))
+      (json["cathode"].as<int>() == 1 && inHealRange && hour() % 2 != 0 && minute() <= 10) ||
+      (json["cathode"].as<int>() == 2 && (inHealRange && hour() % 2 != 0 && minute() <= 10) || (minute() < 1 && hour() % 2 != 0)) ||
+      (json["cathode"].as<int>() == 3 && (inHealRange && hour() % 2 == 0 && minute() <= 10) || (minute() < 1 && hour() % 2 == 0))
     ) {
       healingCycle(); // do healing loop if the time is right :)
     } else {
@@ -326,8 +362,14 @@ void loop() {
   }
 
   if (animations.IsAnimating()) animations.UpdateAnimations();
+  
   strip.SetPixelColor(1, RgbColor(0, 0, 0));
   strip.SetPixelColor(3, RgbColor(0, 0, 0));
+
+  //strip.SetPixelColor(0, RgbColor(0, 0, 0));
+  //strip.SetPixelColor(2, RgbColor(0, 0, 0));
+  //strip.SetPixelColor(4, RgbColor(0, 0, 0));
+  
   //strip.SetPixelColor(3, RgbColor(0, 0, 0));
   strip.Show();
 

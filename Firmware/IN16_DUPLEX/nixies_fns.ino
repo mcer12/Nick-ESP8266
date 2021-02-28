@@ -76,7 +76,10 @@ void showTime() {
   int hours = hour();
   if (hours > 12 && json["t_format"].as<int>() == 0) { // 12 / 24 h format
     hours -= 12;
+  } else if (hours == 0 && json["t_format"].as<int>() == 0){
+      hours = 12;
   }
+  
   int splitTime[4] = {
     (hours / 10) % 10,
     hours % 10,
@@ -130,8 +133,13 @@ void showIP(int delay_ms) {
 }
 
 void toggleNightMode() {
-  if (json["nmode"].as<int>() == 0) return;
-  if (hour() >= 22 || hour() <= 6) {
+  if (wake_hour == -1) return;
+  if (inSleepRange && sleep_hour != -1){
+      blankAllDigits();
+      bri = 0;
+      return;
+  }
+  if (inDimRange && dim_hour != -1){
     bri = 0;
     return;
   }
@@ -139,7 +147,7 @@ void toggleNightMode() {
 }
 
 void healingCycle() {
-    strip.ClearTo(RgbColor(0, 0, 0)); // red
+    strip.ClearTo(RgbColor(0, 0, 32)); // a dim blue
     strip.Show();
     for (int i = 0; i < 4; i++) {
       setDigit(i, healPattern[i][healIterator]);

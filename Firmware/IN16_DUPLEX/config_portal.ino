@@ -103,11 +103,26 @@ void handleRoot() {
     if (server.hasArg("bri")) {
       json["bri"] = server.arg("bri");
     }
-    if (server.hasArg("nmode")) {
-      json["nmode"] = server.arg("nmode");
+    //if (server.hasArg("nmode")) {
+    //      json["nmode"] = server.arg("nmode");
+    //}
+    if (server.hasArg("wake_hour")) {
+      json["wake_hour"] = server.arg("wake_hour");
+    }
+    if (server.hasArg("dim_hour")) {
+      json["dim_hour"] = server.arg("dim_hour");
+    }
+    if (server.hasArg("sleep_hour")) {
+      json["sleep_hour"] = server.arg("sleep_hour");
     }
     if (server.hasArg("cathode")) {
       json["cathode"] = server.arg("cathode");
+    }
+    if (server.hasArg("cathode_start")) {
+      json["cathode_start"] = server.arg("cathode_start");
+    }
+    if (server.hasArg("cathode_end")) {
+      json["cathode_end"] = server.arg("cathode_end");
     }
     if (server.hasArg("rst_cycle")) {
       json["rst_cycle"] = server.arg("rst_cycle");
@@ -225,6 +240,7 @@ void handleRoot() {
   html += ">High</option>";
   html += "</select></div>";
 
+  /*
   html += "<div class=\"row\"><label for=\"nmode\">Night mode:</label>";
   html += "<select id=\"nmode\" name=\"nmode\">";
   unsigned int nmode = json["nmode"].as<unsigned int>();
@@ -238,6 +254,7 @@ void handleRoot() {
   //if (nmode == 2) html += " selected";
   //html += ">Clock OFF between 22:00-06:00</option>";
   html += "</select></div>";
+  */
 
   html += "<div class=\"row\"><label for=\"cathode\">Cathode poisoning prevention:</label>";
   html += "<select id=\"cathode\" name=\"cathode\">";
@@ -247,11 +264,24 @@ void handleRoot() {
   html += ">None</option>";
   html += "<option value=\"1\"";
   if (cathode == 1) html += " selected";
-  html += ">10min cycle every hour between 2-6 AM</option>";
+  html += ">10min cycle every odd hour from Start Hour to End Hour</option>";
   html += "<option value=\"2\"";
   if (cathode == 2) html += " selected";
-  html += ">10min cycle every hour between 2-6 AM + 60s cycle every hour (recommended)</option>";
+  html += ">10min cycle every odd hour between Start Hour to End Hour + 60s cycle every odd hour</option>";
+  html += "<option value=\"3\"";
+  if (cathode == 3) html += " selected";
+  html += ">10min cycle every even hour between Start Hour to End Hour + 60s cycle every even hour (recommended)</option>";
   html += "</select></div>";
+
+  html += "<div class=\"row\"><label for=\"cathode_start\">What hour to start doing 10 minute cathode healing cycles (0-23) -1 disables cycles:</label>";
+  html += "<input type=\"number\" id=\"cathode_start\" name=\"cathode_start\" min=\"-1\" max=\"23\" value=\"";
+  html += json["cathode_start"].as<int>();
+  html += "\"></div>";
+
+  html += "<div class=\"row\"><label for=\"cathode_end\">What hour to end cycles (0-23):</label>";
+  html += "<input type=\"number\" id=\"cathode_end\" name=\"cathode_end\" min=\"-1\" max=\"23\" value=\"";
+  html += json["cathode_end"].as<int>();
+  html += "\"></div>";
 
   html += "<div class=\"row\"><label for=\"rst_cycle\">Cycle through digits after every reset:</label>";
   html += "<select id=\"rst_cycle\" name=\"rst_cycle\">";
@@ -275,6 +305,23 @@ void handleRoot() {
   html += ">Yes</option>";
   html += "</select></div>";
 
+  html += "<h2>Night mode settings</h2>";
+  html += "<p>At a set time, go to Low brightness, then turn the tubes off at another time (just before bed time?)</p>";
+
+  html += "<div class=\"row\"><label for=\"wake_hour\">Wake Hour (sets the tubes back to their normal state at this time: 0-23) Set to -1 to disable dimming and sleeping:</label>";
+  html += "<input type=\"number\" id=\"wake_hour\" name=\"wake_hour\" min=\"-1\" max=\"23\" value=\"";
+  html += json["wake_hour"].as<int>();
+  html += "\"></div>";
+
+  html += "<div class=\"row\"><label for=\"dim_hour\">Dim Hour (sets the tubes to low brightness: 0-23) Set to -1 to not dim:</label>";
+  html += "<input type=\"number\" id=\"dim_hour\" name=\"dim_hour\" min=\"-1\" max=\"23\" value=\"";
+  html += json["dim_hour"].as<int>();
+  html += "\"></div>";
+
+  html += "<div class=\"row\"><label for=\"sleep_hour\">Sleep Hour (blanks the digits: 0-23) Set to -1 to not sleep:</label>";
+  html += "<input type=\"number\" id=\"sleep_hour\" name=\"sleep_hour\" min=\"-1\" max=\"23\" value=\"";
+  html += json["sleep_hour"].as<int>();
+  html += "\"></div>";
 
   html += "<h2>Time settings</h2>";
   html += "<p>Set your timezone and optionally also daylight saving.</p>";
