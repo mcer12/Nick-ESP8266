@@ -24,8 +24,8 @@
 #include <Timezone.h>
 
 #define AP_NAME "NICK_IN16D_"
-#define FW_NAME "FLORA"
-#define FW_VERSION "2.1"
+#define FW_NAME "NICK"
+#define FW_VERSION "2.1.1"
 #define CONFIG_TIMEOUT 300000 // 300000 = 5 minutes
 
 // ONLY CHANGE DEFINES BELOW IF YOU KNOW WHAT YOU'RE DOING!
@@ -52,7 +52,7 @@ const char* update_username = "nick";
 const char* update_password = "nick";
 const char* ntpServerName = "pool.ntp.org";
 
-const int connectingAnimationSteps = 800; // dotsAnimationSteps * TIMER_INTERVAL_uS = one animation cycle time in microseconds
+const int connectingAnimationSteps = 500; // dotsAnimationSteps * TIMER_INTERVAL_uS = one animation cycle time in microseconds
 
 HsbColor red[] = {
   HsbColor(RgbColor(100, 0, 0)), // LOW
@@ -258,7 +258,7 @@ void setup() {
     for (int i = 0; i < 1000; i++) {
       if (WiFi.status() != WL_CONNECTED) {
         if (i > 200) { // 20s timeout
-          //enableDotsAnimation = false;
+          enableConnectingAnimation = false;
           deviceMode = CONFIG_MODE;
           updateColonColor(red[bri]);
           strip_show();
@@ -352,5 +352,5 @@ void loop() {
   strip_show();
 
   server.handleClient();
-  delay(10); // Keeps the ESP cold!
+  delay(1); // Keeps the ESP cold!
 }
