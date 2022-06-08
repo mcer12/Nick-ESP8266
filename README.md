@@ -1,6 +1,6 @@
 # Nick-ESP8266
 
-### This project is deprecated and no longer supported.
+### This project is deprecated and not recommended.
 
 Nick is an open source nixie clock based on ESP8266 designed to be as simple as possible and as compact as possible. There are three versions of Nick you can make, one is direct driven IN-12, second version is duplexed IN-12 and finally a tiny duplexed IN-16 version. The clock uses NTP to sync with internet time.
 
